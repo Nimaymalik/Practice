@@ -1,30 +1,51 @@
 package DSA_Round2.Backtracking;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class NQueen {
-    static int n = 4;
+    public static List<List<String>> solveNQueens(int n) {
+        List<List<String>> result = new ArrayList<>();
+        char[][] board = new char[n][n];
 
-    public static boolean isSafe(char[][] board, int row, int col) {
-        // column check
+        // Initialize board with '.'
         for (int i = 0; i < n; i++) {
-            if (board[i][col] == 'Q') {
-                return false;
-            }
-        }
-        // row check
-        for (int i = 0; i < n; i++) {
-            if (board[row][i] == 'Q') {
-                return false;
-            }
+            Arrays.fill(board[i], '.');
         }
 
-        // both diagonal check
-        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+        solve(board, 0, result, n);
+        return result;
+    }
+
+    public static void solve(char[][] board, int row, List<List<String>> result, int n) {
+        if (row == n) {
+            result.add(construct(board));
+            return;
+        }
+
+        for (int col = 0; col < n; col++) {
+            if (isSafe(board, row, col, n)) {
+                board[row][col] = 'Q'; // place queen
+                solve(board, row + 1, result, n); // recurse
+                board[row][col] = '.'; // backtrack
+            }
+        }
+    }
+
+    public static boolean isSafe(char[][] board, int row, int col, int n) {
+        // Check column
+        for (int i = 0; i < row; i++) {
+            if (board[i][col] == 'Q')
+                return false;
+        }
+
+        // Check upper-left diagonal
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
             if (board[i][j] == 'Q')
                 return false;
         }
-        for (int i = row, j = col; i >= 0 && j < n; i--, j++) {
+
+        // Check upper-right diagonal
+        for (int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
             if (board[i][j] == 'Q')
                 return false;
         }
@@ -32,39 +53,22 @@ public class NQueen {
         return true;
     }
 
-    public static void queen(char[][] board, int row) {
-        if (row == n) {
-            display(board);
-
+    public static List<String> construct(char[][] board) {
+        List<String> list = new ArrayList<>();
+        for (char[] row : board) {
+            list.add(new String(row));
         }
-        for (int col = 0; col < n; col++) {
-            if (isSafe(board, row, col)) {
-                board[row][col] = 'Q';// adding the queen
-                queen(board, row + 1);// after adding moving to next row
-                board[row][col] = '.'; // reseting the value after unsuccessful placement
-            }
-        }
-    }
-
-    public static void display(char[][] board) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.print(board[i][j] + " ");
-
-            }
-            System.out.println();
-
-        }
-
+        return list;
     }
 
     public static void main(String[] args) {
+        int n = 4;
         // given the size of board n and m which should be same
         char[][] arr = new char[n][n];
         for (int i = 0; i < n; i++) {
             Arrays.fill(arr[i], '.');
         }
-        queen(arr, 0);
+        solveNQueens(n);
 
     }
 
